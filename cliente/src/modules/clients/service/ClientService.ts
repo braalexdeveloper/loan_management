@@ -13,6 +13,12 @@ export const getClients=async ()=>{
     return data;
 }
 
+export const getClientById=async (id:number)=>{
+   const response=await fetch(`${API_URL}/${id}`);
+   if(!response.ok) throw new Error("Error al obtener cliente");
+   return await response.json();
+}
+
 export const createClient = async (client: ClientI) => {
     const response = await fetch(API_URL,{
      method:"POST",
@@ -22,11 +28,13 @@ export const createClient = async (client: ClientI) => {
      body:JSON.stringify(client),
     });
 
+    const result=await response.json();
+
     if(!response.ok){
-        throw new Error("Error al crear cliente!");
+        throw new Error(result.errors[0].property ?? "Error al crear cliente rr!");
     }
 
-    return await response.json();
+    return result;
 }
 
 export const updateClient=async (client:ClientI,id:number)=>{
@@ -38,11 +46,12 @@ export const updateClient=async (client:ClientI,id:number)=>{
      body:JSON.stringify(client),
   });
 
+  const result = await response.json();
   if (!response.ok) {
-    throw new Error("Error al actualizar el cliente");
+    throw new Error(result.message ?? "Error al actualizar el cliente");
   }
   
-  return await response.json();
+  return result;
 }
 
 

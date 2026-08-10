@@ -7,7 +7,7 @@ import ClientForm from "../components/ClientForm";
 import { alertError, alertSuccess } from "../../../utils/alertService";
 
 export default function ClientCreatePage() {
-    const { responseCreateClient,error } = useSelector((state: RootState) => state.clients);
+    
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
@@ -34,11 +34,12 @@ export default function ClientCreatePage() {
 
         
         if (createClientThunk.fulfilled.match(result)) {
-            console.log(responseCreateClient);
-            alertSuccess("Éxito",responseCreateClient.msg);
+            console.log("result",result);
+            alertSuccess("Éxito",result.payload.msg);
             navigate("/clients");
         }else if(createClientThunk.rejected.match(result)){
-            alertError("Error",error ?? "Error al crear cliente desde react")
+            console.log("eeror api",result);
+            alertError("Error",result.error.message ?? "Error al crear cliente desde react")
         }
     }
 

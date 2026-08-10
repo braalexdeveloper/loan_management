@@ -9,6 +9,7 @@ const route=Router();
 const clientController=new ClientController();
 
 route.get('/clients',clientController.getClients.bind(clientController));
+route.get('/clients/:id',clientController.getClientById.bind(clientController));
 route.post('/clients',validateDto(createClientDto),clientController.createClient.bind(clientController));
 route.put('/clients/:id',validateDto(updateClientDto),clientController.updateClient.bind(clientController));
 route.delete('/clients/:id',clientController.deleteClient.bind(clientController));

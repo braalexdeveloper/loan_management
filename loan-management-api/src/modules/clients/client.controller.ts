@@ -16,6 +16,11 @@ export class ClientController{
       
     }
 
+    async getClientById(req:Request,res:Response){
+    const client=await this.clientService.getClient(Number(req.params.id));
+    res.status(200).json(client);
+    }
+
     async createClient(req:Request,res:Response,next:NextFunction){
         try {
             const client=await this.clientService.createClient(req.body);

@@ -17,6 +17,10 @@ export class ClientService{
         return await this.clientRepository.find();
     }
 
+    async getClient(id:number){
+        return await this.clientRepository.findOne({where:{id}});
+    }
+
     async createClient(client:createClientDto){
       return await this.clientRepository.save(client);
     }

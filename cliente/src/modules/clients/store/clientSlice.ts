@@ -1,21 +1,23 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { ClientI } from "../interfaces/ClientI";
-import { createClient, deleteClient, getClients, updateClient } from "../service/ClientService";
+import { createClient, deleteClient, getClientById, getClients, updateClient } from "../service/ClientService";
 
 interface ClientState {
   clients: ClientI[];
-  responseCreateClient:any;
-  responseUpdateClient:any;
-  responseDeleteClient:any;
+  getClient: ClientI | null;
+  responseCreateClient: any;
+  responseUpdateClient: any;
+  responseDeleteClient: any;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: ClientState = {
   clients: [],
-  responseCreateClient:{},
-  responseUpdateClient:{},
-  responseDeleteClient:{},
+  getClient: null,
+  responseCreateClient: {},
+  responseUpdateClient: {},
+  responseDeleteClient: {},
   loading: false,
   error: null,
 };
@@ -31,11 +33,16 @@ export const createClientThunk = createAsyncThunk("clients/create", async (clien
   return await createClient(client);
 });
 
-export const updatedClientThunk=createClientThunk("clients/update", async(client:ClientI,id:number)=>{
-  return await updateClient(client,id);
+export const getClientByIdThunk = createAsyncThunk("clients/getClientById", async (id: number) => {
+  return await getClientById(id);
 });
 
-export const deleteClientThunk=createAsyncThunk("clients/delete",async(id:number)=>{
+export const updatedClientThunk = createAsyncThunk("clients/update", async (client: ClientI) => {
+  const { id, ...data } = client;
+  return await updateClient(data,Number(id));
+});
+
+export const deleteClientThunk = createAsyncThunk("clients/delete", async (id: number) => {
   return await deleteClient(id);
 });
 
@@ -63,28 +70,54 @@ const clientSlice = createSlice({
         state.error =
           action.error.message ?? "Error al cargar clientes";
       })
+      //getClientById
+      .addCase(getClientByIdThunk.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getClientByIdThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.getClient = action.payload;
+      })
+      .addCase(getClientByIdThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message ?? "Error al obtener cliente!";
+      })
       //create client
-      .addCase(createClientThunk.pending,(state)=>{
-        state.loading=true;
-        state.error=null;
+      .addCase(createClientThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
-      .addCase(createClientThunk.fulfilled,(state,action)=>{
-        state.loading=false;
-        state.responseCreateClient=action.payload;
+      .addCase(createClientThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.responseCreateClient = action.payload;
       })
-      .addCase(createClientThunk.rejected,(state,action)=>{
-        state.loading=false;
-        state.error=action.error.message ?? "Error al crear cliente!";
+      .addCase(createClientThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message ?? "Error al crear clienteuii!";
+      })
+      //Update client
+      .addCase(updatedClientThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updatedClientThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.responseUpdateClient=action.payload;
+      })
+      .addCase(updatedClientThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.error.message ?? "Error al actualizar cliente";
       })
       //Delete client
-      .addCase(deleteClientThunk.pending,(state)=>{
-        state.responseDeleteClient="";
+      .addCase(deleteClientThunk.pending, (state) => {
+        state.responseDeleteClient = "";
       })
-      .addCase(deleteClientThunk.fulfilled,(state,action)=>{
-        state.responseDeleteClient=action.payload;
+      .addCase(deleteClientThunk.fulfilled, (state, action) => {
+        state.responseDeleteClient = action.payload;
       })
-      .addCase(deleteClientThunk.rejected,(state,action)=>{
-        state.responseDeleteClient=action.error.message ?? "Error al eliminar cliente desde frontend";
+      .addCase(deleteClientThunk.rejected, (state, action) => {
+        state.responseDeleteClient = action.error.message ?? "Error al eliminar cliente desde frontend";
       })
   },
 });

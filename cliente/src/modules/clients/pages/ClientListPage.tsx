@@ -204,12 +204,12 @@ export default function ClientListPage() {
 
                                                 <div className="d-flex justify-content-center gap-2">
 
-                                                    <button
+                                                    <Link to={"/clients/edit/"+client.id}
                                                         className="btn btn-sm btn-outline-primary"
                                                         title="Editar cliente"
                                                     >
                                                         <i className="bi bi-pencil"></i>
-                                                    </button>
+                                                    </Link>
 
                                                     <button
                                                         className="btn btn-sm btn-outline-danger"

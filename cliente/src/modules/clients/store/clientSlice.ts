@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { ClientI } from "../interfaces/ClientI";
-import { createClient, deleteClient, getClients } from "../service/ClientService";
+import { createClient, deleteClient, getClients, updateClient } from "../service/ClientService";
 
 interface ClientState {
   clients: ClientI[];
   responseCreateClient:any;
+  responseUpdateClient:any;
   responseDeleteClient:any;
   loading: boolean;
   error: string | null;
@@ -13,6 +14,7 @@ interface ClientState {
 const initialState: ClientState = {
   clients: [],
   responseCreateClient:{},
+  responseUpdateClient:{},
   responseDeleteClient:{},
   loading: false,
   error: null,
@@ -27,6 +29,10 @@ export const getClientsThunk = createAsyncThunk(
 
 export const createClientThunk = createAsyncThunk("clients/create", async (client: ClientI) => {
   return await createClient(client);
+});
+
+export const updatedClientThunk=createClientThunk("clients/update", async(client:ClientI,id:number)=>{
+  return await updateClient(client,id);
 });
 
 export const deleteClientThunk=createAsyncThunk("clients/delete",async(id:number)=>{

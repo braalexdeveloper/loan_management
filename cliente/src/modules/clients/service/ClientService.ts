@@ -29,6 +29,22 @@ export const createClient = async (client: ClientI) => {
     return await response.json();
 }
 
+export const updateClient=async (client:ClientI,id:number)=>{
+  const response=await fetch(API_URL+"/"+id,{
+    method:"PUT",
+    headers:{
+        "Content-Type":"application/json",
+     },
+     body:JSON.stringify(client),
+  });
+
+  if (!response.ok) {
+    throw new Error("Error al actualizar el cliente");
+  }
+  
+  return await response.json();
+}
+
 
   export const deleteClient = async (id: number) => {
   const response = await fetch(`${API_URL}/${id}`, {

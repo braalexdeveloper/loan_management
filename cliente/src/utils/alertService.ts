@@ -5,7 +5,9 @@ export const alertSuccess=(title:string,text?:string)=>{
     icon:"success",
     title,
     text,
-    confirmButtonText:"Aceptar",
+    timer:2000,
+    showConfirmButton:false,
+    timerProgressBar:true,
  });
 }
 

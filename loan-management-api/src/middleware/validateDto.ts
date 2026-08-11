@@ -1,24 +1,26 @@
-import { Request,Response,NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 
-export function validateDto(dtoClass:any){
-    return async (req:Request,res:Response,next:NextFunction)=>{
-      const dto=plainToInstance(dtoClass,req.body);
-      const errors=await validate(dto);
+export function validateDto(dtoClass: any) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const dto = plainToInstance(dtoClass, req.body);
+    const errors = await validate(dto);
 
-      if(errors.length>0){
-        return res.status(400).json({
-            errors:errors.map(error=>({
-                property: error.property,
-                    constraints: error.constraints
-            }))
-        })
-      }
+    if (errors.length > 0) {
+      return res.status(400).json({
+        status:400,
+        message: "Validation failed",
+        errors: errors.reduce<Record<string, string>>((acc, error) => {
+          acc[error.property] = Object.values(error.constraints ?? {})[0];
+          return acc;
+        }, {})
+      })
+    }
 
-      req.body=dto;
-      next();
+    req.body = dto;
+    next();
 
-    };
+  };
 }

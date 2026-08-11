@@ -15,4 +15,9 @@ export class PaymentController{
         res.status(201).json({msg:"Pago creado con éxito",payment});
     }
 
+    async deletePayment(req:Request,res:Response){
+        await this.paymentService.deletePayment(Number(req.params.id));
+        res.status(200).json({msg:"Pago eliminado correctamente!"});
+    }
+
 }

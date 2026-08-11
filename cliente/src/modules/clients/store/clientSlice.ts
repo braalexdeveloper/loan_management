@@ -92,6 +92,7 @@ const clientSlice = createSlice({
         state.responseCreateClient = action.payload;
       })
       .addCase(createClientThunk.rejected, (state, action) => {
+        console.log("createthunkRejected",action.error)
         state.loading = false;
         state.error = action.error.message ?? "Error al crear clienteuii!";
       })

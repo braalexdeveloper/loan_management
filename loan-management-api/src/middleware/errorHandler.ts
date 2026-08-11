@@ -4,7 +4,7 @@ import { Request,Response,NextFunction } from "express";
 export function errorHandler(error:any,req:Request,res:Response,next:NextFunction){
    
     if(error.statusCode){
-        return res.status(error.statusCode).json({message:error.message});
+        return res.status(error.statusCode).json({status:error.statusCode,error:error.message});
     }
 
     console.error(error);

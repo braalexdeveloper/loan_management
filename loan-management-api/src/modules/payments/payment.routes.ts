@@ -22,4 +22,6 @@ router.get(
 
 router.post('/payments',validateDto(RequestPaymentDto),paymentController.createPayment.bind(paymentController));
 
+router.delete('/payments/:id',paymentController.deletePayment.bind(paymentController));
+
 export default router;

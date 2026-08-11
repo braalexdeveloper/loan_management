@@ -4,6 +4,8 @@ import { AppDataSource } from "../../config/db";
 import { createClientDto } from "./dtos/createClientDto";
 import { updateClientDto } from "./dtos/updateClientDto";
 import { NotFoundError } from "../../errors/NotFoundError";
+import { BadRequestError } from "../../errors/BadRequestError";
+import { ConflictError } from "../../errors/ConflictError";
 
 
 export class ClientService{
@@ -22,6 +24,10 @@ export class ClientService{
     }
 
     async createClient(client:createClientDto){
+        const existDni=await this.clientRepository.findOne({where:{dni:client.dni}});
+      if(existDni) throw new ConflictError("DNI ya existe!");
+      const existEmail=await this.clientRepository.findOne({where:{email:client.email}});
+      if(existEmail) throw new ConflictError("El email ya existe!");
       return await this.clientRepository.save(client);
     }
 

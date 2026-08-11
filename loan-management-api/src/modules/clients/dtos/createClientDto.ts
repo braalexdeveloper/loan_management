@@ -16,7 +16,7 @@ export class createClientDto{
     @IsEmail()
     email!:string;
 
-    @IsNotEmpty()
+    @IsNotEmpty({message:"El telefono es campo obligatorio!"})
     phone!:string;
 
     @IsNotEmpty()

@@ -72,4 +72,48 @@ export class PaymentService {
 
         
     }
+
+    async deletePayment(id:number){
+        return await AppDataSource.transaction(async (manager)=>{
+            const loanRepo=manager.getRepository(Loan);
+            const paymentRepo=manager.getRepository(Payment);
+
+            const foundPayment=await paymentRepo
+                .createQueryBuilder("payment")
+                .leftJoinAndSelect("payment.loan","loan")
+                .where("payment.id = :id",{id})
+                .getOne();
+
+            if(!foundPayment){
+                throw new NotFoundError("Pago no encontrado!");
+            }
+
+            const foundLoan=foundPayment.loan;
+
+            const subsequentPayments=await paymentRepo
+                .createQueryBuilder("payment")
+                .innerJoin("payment.loan","loan")
+                .where("loan.id = :loanId",{loanId:foundLoan.id})
+                .andWhere("payment.installmentNumber > :installmentNumber",{
+                    installmentNumber:foundPayment.installmentNumber
+                })
+                .getMany();
+
+            foundLoan.remainingBalance=
+                Number(foundLoan.remainingBalance)+Number(foundPayment.amount);
+            foundLoan.paidInstallments=Math.max(0,foundLoan.paidInstallments-1);
+
+            if(foundLoan.status===LoanStatus.PAID){
+                foundLoan.status=LoanStatus.PENDING;
+            }
+
+            for(const payment of subsequentPayments){
+                payment.installmentNumber-=1;
+            }
+
+            await paymentRepo.remove(foundPayment);
+            await paymentRepo.save(subsequentPayments);
+            await loanRepo.save(foundLoan);
+        });
+    }
 }

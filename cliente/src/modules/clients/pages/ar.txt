@@ -1,0 +1,160 @@
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { type AppDispatch } from "../../../store";
+import { createClientThunk } from "../store/clientSlice";
+import ClientForm from "../components/ClientForm";
+import { alertError, alertSuccess } from "../../../utils/alertService";
+import type { ClientI } from "../interfaces/ClientI";
+
+type ClientFormData = Omit<ClientI, "id">;
+type ValidationErrors = Partial<Record<keyof ClientFormData, string>>;
+
+const validateField = (field: keyof ClientFormData, value: string): string | undefined => {
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) return "Este campo es obligatorio.";
+
+    switch (field) {
+        case "name":
+        case "lastName":
+            return trimmedValue.length < 2 ? "Debe tener al menos 2 caracteres." : undefined;
+        case "dni":
+            return /^\d{8}$/.test(trimmedValue) ? undefined : "El DNI debe tener exactamente 8 dígitos.";
+        case "email":
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedValue) ? undefined : "Ingrese un correo electrónico válido.";
+        case "phone":
+            return /^\d{9}$/.test(trimmedValue) ? undefined : "El celular debe tener exactamente 9 dígitos.";
+        case "address":
+            return trimmedValue.length < 5 ? "Ingrese una dirección más completa." : undefined;
+    }
+};
+
+const validateClient = (client: ClientFormData): ValidationErrors => {
+    const errors: ValidationErrors = {};
+
+    (Object.keys(client) as Array<keyof ClientFormData>).forEach((field) => {
+        const error = validateField(field, client[field]);
+        if (error) errors[field] = error;
+    });
+
+    return errors;
+};
+
+export default function ClientCreatePage() {
+    
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+
+    const [client, setClient] = useState<ClientFormData>({
+        name: '',
+        lastName: '',
+        dni: '',
+        email: '',
+        phone: '',
+        address: ''
+    });
+
+    const [errors, setErrors] = useState<ValidationErrors>({});
+
+    const handlerInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const field = e.target.name as keyof ClientFormData;
+        const value = e.target.value;
+
+        setClient((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+
+        const error = validateField(field, value);
+        setErrors((prev) => {
+            if (error) return { ...prev, [field]: error };
+
+            const { [field]: _, ...remainingErrors } = prev;
+            return remainingErrors;
+        });
+    }
+
+    const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const validationErrors = validateClient(client);
+        setErrors(validationErrors);
+
+        if (Object.keys(validationErrors).length > 0) return;
+
+        const result = await dispatch(createClientThunk(client));
+ 
+        
+        if (createClientThunk.fulfilled.match(result)) {
+            console.log("result",result);
+            alertSuccess("Éxito",result.payload.msg);
+            navigate("/clients");
+        }else if(createClientThunk.rejected.match(result)){
+            console.log("eeror api",result);
+            alertError("Error",result.error.message ?? "Error al crear cliente desde react")
+        }
+    }
+
+
+return (
+    <div className="container-fluid">
+
+        {/* Header */}
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+
+            <div>
+                <h1 className="h3 mb-1 fw-semibold">
+                    Nuevo cliente
+                </h1>
+
+                <p className="text-muted mb-0">
+                    Registra la información del nuevo cliente.
+                </p>
+            </div>
+
+        </div>
+
+
+        {/* Card */}
+        <div className="card border-0 shadow-sm">
+
+            {/* Card Header */}
+            <div className="card-header bg-white border-bottom py-3">
+
+                <div className="d-flex align-items-center">
+
+                    <div
+                        className="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3"
+                        style={{
+                            width: "45px",
+                            height: "45px",
+                        }}
+                    >
+                        <i className="bi bi-person-plus fs-5"></i>
+                    </div>
+
+                    <div>
+                        <h5 className="mb-1">
+                            Información del cliente
+                        </h5>
+
+                        <small className="text-muted">
+                            Completa los datos personales y de contacto.
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+
+             <ClientForm client={client} errors={errors} handlerInput={handlerInput} submitForm={submitForm} />
+            
+
+        </div>
+
+    </div>
+)
+
+
+}

@@ -1,17 +1,21 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { type AppDispatch, type RootState } from "../../../store";
+import { type AppDispatch } from "../../../store";
 import { createClientThunk } from "../store/clientSlice";
 import ClientForm from "../components/ClientForm";
 import { alertError, alertSuccess } from "../../../utils/alertService";
+import type { ClientI } from "../interfaces/ClientI";
+import { validateClient, validateField } from "../utils/clientValidation";
+
+
 
 export default function ClientCreatePage() {
-    
+
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
-    const [client, setClient] = useState({
+    const [client, setClient] = useState<ClientI>({
         name: '',
         lastName: '',
         dni: '',
@@ -20,88 +24,111 @@ export default function ClientCreatePage() {
         address: ''
     });
 
+    const [errors, setErrors] = useState<Record<string, string>>({});
+
     const handlerInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+
         setClient((prev) => ({
             ...prev,
             [e.target.name]: e.target.value,
         }));
+
+
+    }
+
+    const onBlurValidateForm = (e: React.FocusEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        const error = validateField(name, value);
+
+        setErrors((prev) => ({
+            ...prev,
+            [name]: error
+        }));
+
     }
 
     const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const validateForm = validateClient(client);
+        if (!validateForm) {
+            return;
+        }
+        console.log("errors", errors)
+
 
         const result = await dispatch(createClientThunk(client));
 
-        
+
         if (createClientThunk.fulfilled.match(result)) {
-            console.log("result",result);
-            alertSuccess("Éxito",result.payload.msg);
+            console.log("result", result);
+            alertSuccess("Éxito", result.payload.msg);
             navigate("/clients");
-        }else if(createClientThunk.rejected.match(result)){
-            console.log("eeror api",result);
-            alertError("Error",result.error.message ?? "Error al crear cliente desde react")
+        } else if (createClientThunk.rejected.match(result)) {
+            console.log("eeror api", result);
+            alertError("Error", result.error.message ?? "Error al crear cliente desde react")
         }
     }
 
 
-return (
-    <div className="container-fluid">
+    return (
+        <div className="container-fluid">
 
-        {/* Header */}
-        <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+            {/* Header */}
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
 
-            <div>
-                <h1 className="h3 mb-1 fw-semibold">
-                    Nuevo cliente
-                </h1>
+                <div>
+                    <h1 className="h3 mb-1 fw-semibold">
+                        Nuevo cliente
+                    </h1>
 
-                <p className="text-muted mb-0">
-                    Registra la información del nuevo cliente.
-                </p>
-            </div>
-
-        </div>
-
-
-        {/* Card */}
-        <div className="card border-0 shadow-sm">
-
-            {/* Card Header */}
-            <div className="card-header bg-white border-bottom py-3">
-
-                <div className="d-flex align-items-center">
-
-                    <div
-                        className="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3"
-                        style={{
-                            width: "45px",
-                            height: "45px",
-                        }}
-                    >
-                        <i className="bi bi-person-plus fs-5"></i>
-                    </div>
-
-                    <div>
-                        <h5 className="mb-1">
-                            Información del cliente
-                        </h5>
-
-                        <small className="text-muted">
-                            Completa los datos personales y de contacto.
-                        </small>
-                    </div>
-
+                    <p className="text-muted mb-0">
+                        Registra la información del nuevo cliente.
+                    </p>
                 </div>
 
             </div>
 
-             <ClientForm client={client} handlerInput={handlerInput} submitForm={submitForm} />
-            
+
+            {/* Card */}
+            <div className="card border-0 shadow-sm">
+
+                {/* Card Header */}
+                <div className="card-header bg-white border-bottom py-3">
+
+                    <div className="d-flex align-items-center">
+
+                        <div
+                            className="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3"
+                            style={{
+                                width: "45px",
+                                height: "45px",
+                            }}
+                        >
+                            <i className="bi bi-person-plus fs-5"></i>
+                        </div>
+
+                        <div>
+                            <h5 className="mb-1">
+                                Información del cliente
+                            </h5>
+
+                            <small className="text-muted">
+                                Completa los datos personales y de contacto.
+                            </small>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <ClientForm client={client} errors={errors} onBlurValidateForm={onBlurValidateForm} handlerInput={handlerInput} submitForm={submitForm} />
+
+
+            </div>
 
         </div>
-
-    </div>
-)
+    )
 
 
 }

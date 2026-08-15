@@ -6,6 +6,7 @@ import { getClientByIdThunk, updatedClientThunk } from "../store/clientSlice";
 import ClientForm from "../components/ClientForm";
 import { alertError, alertSuccess } from "../../../utils/alertService";
 import type { ClientI } from "../interfaces/ClientI";
+import { validateClient, validateField } from "../utils/clientValidation";
 
 export default function ClientCreatePage() {
     const { getClient } = useSelector((state: RootState) => state.clients);
@@ -23,6 +24,23 @@ export default function ClientCreatePage() {
         address: "",
     });
 
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    
+       
+    
+       
+     const onBlurValidateForm = (e: React.FocusEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        const error = validateField(name, value);
+
+        setErrors((prev) => ({
+            ...prev,
+            [name]: error
+        }));
+
+
+    }
+
     const handlerInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setClient((prev) => ({
             ...prev,
@@ -32,6 +50,9 @@ export default function ClientCreatePage() {
 
     const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if(!validateClient(client)){
+          return;
+        }
 
         try {
             const response = await dispatch(updatedClientThunk(client)).unwrap();
@@ -119,7 +140,7 @@ export default function ClientCreatePage() {
 
                 </div>
 
-                <ClientForm client={client} handlerInput={handlerInput} submitForm={submitForm} />
+                <ClientForm client={client} errors={errors} onBlurValidateForm={onBlurValidateForm} handlerInput={handlerInput} submitForm={submitForm}/>
 
 
             </div>

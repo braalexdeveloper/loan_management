@@ -3,11 +3,13 @@ import type { ClientI } from "../interfaces/ClientI";
 
 interface ClientFormProps {
     client: ClientI;
+    errors?: Partial<Record<keyof ClientI, string>>;
+    onBlurValidateForm:any;
     handlerInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
     submitForm: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
-export default function ClientForm({ client, handlerInput, submitForm }: ClientFormProps) {
+export default function ClientForm({ client,errors,onBlurValidateForm, handlerInput, submitForm }: ClientFormProps) {
     return (
         <>
             {/* Form */}
@@ -41,13 +43,14 @@ export default function ClientForm({ client, handlerInput, submitForm }: ClientF
                                     id="name"
                                     name="name"
                                     onChange={handlerInput}
+                                    onBlur={onBlurValidateForm}
                                     value={client.name}
-                                    className="form-control"
+                                    className={`form-control ${errors?.name ? "is-invalid" : ""}`}
                                     placeholder="Ingrese el nombre"
                                 />
+                                {errors?.name && <div className="invalid-feedback">{errors.name}</div>}
 
                             </div>
-
 
                             {/* Apellidos */}
                             <div className="col-md-6">
@@ -65,12 +68,13 @@ export default function ClientForm({ client, handlerInput, submitForm }: ClientF
                                     name="lastName"
                                     onChange={handlerInput}
                                     value={client.lastName}
-                                    className="form-control"
+                                    onBlur={onBlurValidateForm}
+                                    className={`form-control ${errors?.lastName ? "is-invalid" : ""}`}
                                     placeholder="Ingrese los apellidos"
                                 />
+                                {errors?.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
 
                             </div>
-
 
                             {/* DNI */}
                             <div className="col-md-6">
@@ -88,10 +92,12 @@ export default function ClientForm({ client, handlerInput, submitForm }: ClientF
                                     name="dni"
                                     onChange={handlerInput}
                                     value={client.dni}
-                                    className="form-control"
+                                    onBlur={onBlurValidateForm}
+                                    className={`form-control ${errors?.dni ? "is-invalid" : ""}`}
                                     placeholder="Ingrese el DNI"
                                     maxLength={8}
                                 />
+                                {errors?.dni && <div className="invalid-feedback">{errors.dni}</div>}
 
                             </div>
 
@@ -135,11 +141,13 @@ export default function ClientForm({ client, handlerInput, submitForm }: ClientF
                                         name="email"
                                         onChange={handlerInput}
                                         value={client.email}
-                                        className="form-control"
+                                        onBlur={onBlurValidateForm}
+                                        className={`form-control ${errors?.email ? "is-invalid" : ""}`}
                                         placeholder="ejemplo@correo.com"
                                     />
 
                                 </div>
+                                {errors?.email && <div className="invalid-feedback d-block">{errors.email}</div>}
 
                             </div>
 
@@ -166,11 +174,13 @@ export default function ClientForm({ client, handlerInput, submitForm }: ClientF
                                         name="phone"
                                         onChange={handlerInput}
                                         value={client.phone}
-                                        className="form-control"
+                                        onBlur={onBlurValidateForm}
+                                        className={`form-control ${errors?.phone ? "is-invalid" : ""}`}
                                         placeholder="Ingrese el número de celular"
                                     />
 
                                 </div>
+                                {errors?.phone && <div className="invalid-feedback d-block">{errors.phone}</div>}
 
                             </div>
 
@@ -197,11 +207,13 @@ export default function ClientForm({ client, handlerInput, submitForm }: ClientF
                                         name="address"
                                         onChange={handlerInput}
                                         value={client.address}
-                                        className="form-control"
+                                        onBlur={onBlurValidateForm}
+                                        className={`form-control ${errors?.address ? "is-invalid" : ""}`}
                                         placeholder="Ingrese la dirección"
                                     />
 
                                 </div>
+                                {errors?.address && <div className="invalid-feedback d-block">{errors.address}</div>}
 
                             </div>
 

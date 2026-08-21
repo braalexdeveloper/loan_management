@@ -1,10 +1,10 @@
 import type { ClientI } from "../interfaces/ClientI";
 
-const API_URL = "http://localhost:5000/api/clients";
+const API_URL = "http://localhost:8080/api/clients";
 
 
-export const getClients=async ()=>{
-    const response=await fetch(API_URL);
+export const getClients=async (page:number=0,dni:string="")=>{
+    const response=await fetch(API_URL+"?page="+page+"&dni="+dni);
     if (!response.ok) {
     throw new Error("Error al obtener los clientes");
   }

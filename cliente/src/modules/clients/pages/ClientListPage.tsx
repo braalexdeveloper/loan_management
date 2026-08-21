@@ -8,9 +8,10 @@ import { alertConfirm, alertSuccess } from "../../../utils/alertService";
 export default function ClientListPage() {
     const dispatch = useDispatch<AppDispatch>();
 
-    const { clients, loading, responseDeleteClient } = useSelector(
+    const { clients, totalClients, currentPage, totalPages, loading, responseDeleteClient } = useSelector(
         (state: RootState) => state.clients
     );
+    
 
     const deleteClient = async (id: number) => {
 
@@ -19,7 +20,7 @@ export default function ClientListPage() {
         if (result.isConfirmed) {
             const resultDelete = await dispatch(deleteClientThunk(id));
             if (deleteClientThunk.fulfilled.match(resultDelete)) {
-                await dispatch(getClientsThunk());
+                await dispatch(getClientsThunk({}));
                 console.log(responseDeleteClient);
                 await alertSuccess("Éxito", "Cliente eliminado con éxito!");
             }
@@ -28,8 +29,31 @@ export default function ClientListPage() {
 
     }
 
+    function itemPage(page: number) {
+        
+        dispatch(getClientsThunk({page}));
+    }
+
+    const nextPage=()=>{
+        
+        if(currentPage+1>=totalPages){
+            
+           return;
+        }
+        dispatch(getClientsThunk({page:currentPage+1}))
+    }
+
+    const prevPage=()=>{
+        
+         if(currentPage<=0){
+            
+           return;
+        }
+        dispatch(getClientsThunk({page:currentPage-1}))
+    }
+
     useEffect(() => {
-        dispatch(getClientsThunk());
+        dispatch(getClientsThunk({}));
     }, [dispatch]);
 
     return (
@@ -70,7 +94,7 @@ export default function ClientListPage() {
                             </h5>
 
                             <span className="text-muted small">
-                                {clients.length} clientes registrados
+                                {totalClients} clientes registrados
                             </span>
                         </div>
 
@@ -204,7 +228,7 @@ export default function ClientListPage() {
 
                                                 <div className="d-flex justify-content-center gap-2">
 
-                                                    <Link to={"/clients/edit/"+client.id}
+                                                    <Link to={"/clients/edit/" + client.id}
                                                         className="btn btn-sm btn-outline-primary"
                                                         title="Editar cliente"
                                                     >
@@ -244,8 +268,23 @@ export default function ClientListPage() {
                     </div>
                 )}
 
+
+
             </div>
 
+            <div className="row py-4">
+                <nav aria-label="...">
+                    <ul className="pagination">
+                        <li className={`page-item ${currentPage== 0 ? "disabled" : ""}`}><button className="page-link" onClick={prevPage}>Previous</button></li>
+                        {Array.from({ length: totalPages }, (_, index) => (
+                            <li key={index} className={currentPage==index ? "page-item active" : "page-item"}><button className="page-link" onClick={()=>itemPage(index)}>{index + 1}</button></li>
+                        ))}
+
+
+                        <li className={`page-item ${currentPage+1 >= totalPages ? "disabled" : ""}`}><button className="page-link" disabled={currentPage + 1 >= totalPages}  onClick={nextPage}>Next</button></li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     );
 }

@@ -4,16 +4,22 @@ import { createClient, deleteClient, getClientById, getClients, updateClient } f
 
 interface ClientState {
   clients: ClientI[];
-  getClient: ClientI | null;
-  responseCreateClient: any;
-  responseUpdateClient: any;
-  responseDeleteClient: any;
-  loading: boolean;
-  error: string | null;
+  totalClients: number;
+  totalPages: number;
+  currentPage: number;
+getClient: ClientI | null;
+responseCreateClient: any;
+responseUpdateClient: any;
+responseDeleteClient: any;
+loading: boolean;
+error: string | null;
 }
 
 const initialState: ClientState = {
   clients: [],
+  totalClients: 0,
+  totalPages:0,
+  currentPage:0,
   getClient: null,
   responseCreateClient: {},
   responseUpdateClient: {},
@@ -24,8 +30,8 @@ const initialState: ClientState = {
 
 export const getClientsThunk = createAsyncThunk(
   "clients/fetch",
-  async () => {
-    return await getClients();
+  async ({page,dni}:{page?:number,dni?:string}) => {
+    return await getClients(page,dni);
   }
 );
 
@@ -39,7 +45,7 @@ export const getClientByIdThunk = createAsyncThunk("clients/getClientById", asyn
 
 export const updatedClientThunk = createAsyncThunk("clients/update", async (client: ClientI) => {
   const { id, ...data } = client;
-  return await updateClient(data,Number(id));
+  return await updateClient(data, Number(id));
 });
 
 export const deleteClientThunk = createAsyncThunk("clients/delete", async (id: number) => {
@@ -62,7 +68,10 @@ const clientSlice = createSlice({
 
       .addCase(getClientsThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.clients = action.payload;
+        state.clients = action.payload.clients;
+        state.currentPage = action.payload.page;
+        state.totalPages=action.payload.totalPages;
+        state.totalClients=action.payload.totalElements;
       })
 
       .addCase(getClientsThunk.rejected, (state, action) => {
@@ -76,7 +85,7 @@ const clientSlice = createSlice({
       })
       .addCase(getClientByIdThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.getClient = action.payload;
+        state.getClient = action.payload.client;
       })
       .addCase(getClientByIdThunk.rejected, (state, action) => {
         state.loading = false;
@@ -92,7 +101,7 @@ const clientSlice = createSlice({
         state.responseCreateClient = action.payload;
       })
       .addCase(createClientThunk.rejected, (state, action) => {
-        console.log("createthunkRejected",action.error)
+        console.log("createthunkRejected", action.error)
         state.loading = false;
         state.error = action.error.message ?? "Error al crear clienteuii!";
       })
@@ -103,7 +112,7 @@ const clientSlice = createSlice({
       })
       .addCase(updatedClientThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.responseUpdateClient=action.payload;
+        state.responseUpdateClient = action.payload;
       })
       .addCase(updatedClientThunk.rejected, (state, action) => {
         state.loading = false;

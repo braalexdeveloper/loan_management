@@ -16,4 +16,12 @@ public class GlobalExceptionHandler {
              "message",ex.getMessage()
      ));
     }
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<?> handleBusinnesError(BusinessException ex){
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+        "status",400,
+        "message",ex.getMessage()
+      ));
+    }
 }

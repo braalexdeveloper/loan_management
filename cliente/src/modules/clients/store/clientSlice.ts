@@ -4,6 +4,7 @@ import { createClient, deleteClient, getClientById, getClients, updateClient } f
 
 interface ClientState {
   clients: ClientI[];
+  clientByDni:ClientI[];
   totalClients: number;
   totalPages: number;
   currentPage: number;
@@ -17,6 +18,7 @@ error: string | null;
 
 const initialState: ClientState = {
   clients: [],
+  clientByDni:[],
   totalClients: 0,
   totalPages:0,
   currentPage:0,
@@ -32,6 +34,13 @@ export const getClientsThunk = createAsyncThunk(
   "clients/fetch",
   async ({page,dni}:{page?:number,dni?:string}) => {
     return await getClients(page,dni);
+  }
+);
+
+export const getClientDniThunk = createAsyncThunk(
+  "clientsByDni/fetch",
+  async (dni:string) => {
+    return await getClients(0,dni);
   }
 );
 
@@ -78,6 +87,12 @@ const clientSlice = createSlice({
         state.loading = false;
         state.error =
           action.error.message ?? "Error al cargar clientes";
+      })
+      .addCase(getClientDniThunk.pending,(state,action)=>{
+        state.clientByDni=[]
+      })
+      .addCase(getClientDniThunk.fulfilled,(state,action)=>{
+       state.clientByDni=action.payload.clients;
       })
       //getClientById
       .addCase(getClientByIdThunk.pending, (state) => {

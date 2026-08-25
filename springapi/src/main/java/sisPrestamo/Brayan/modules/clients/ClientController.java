@@ -23,22 +23,22 @@ public class ClientController {
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> getClients(
-            @RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "4") int size,@RequestParam(defaultValue = "id") String sortBy,@RequestParam(defaultValue = "") String dni
-    ) {
-        Page<ClientResponse> clients=clientService.getClients(page,size,sortBy,dni);
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "4") int size,
+            @RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "") String dni) {
+        Page<ClientResponse> clients = clientService.getClients(page, size, sortBy, dni);
         return ResponseEntity.ok(new ResponseBuilder()
                 .status("success")
-                .add("clients",clients.getContent())
-                        .add("page",clients.getNumber())
-                        .add("size",clients.getSize())
+                .add("clients", clients.getContent())
+                .add("page", clients.getNumber())
+                .add("size", clients.getSize())
                 .add("totalElements", clients.getTotalElements())
                 .add("totalPages", clients.getTotalPages())
                 .build());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Map<String,Object>> getClient(@PathVariable Long id){
-        return ResponseEntity.ok(new ResponseBuilder().add("client",clientService.getClient(id)).build());
+    public ResponseEntity<Map<String, Object>> getClient(@PathVariable Long id) {
+        return ResponseEntity.ok(new ResponseBuilder().add("client", clientService.getClient(id)).build());
     }
 
     @PostMapping
@@ -63,7 +63,7 @@ public class ClientController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deleteClient(@PathVariable Long id) {
-        
+
         return ResponseEntity.ok(new ResponseBuilder()
                 .status("success")
                 .msg(clientService.deleteClient(id))

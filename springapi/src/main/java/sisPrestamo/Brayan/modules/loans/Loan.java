@@ -6,9 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sisPrestamo.Brayan.modules.clients.Client;
+import sisPrestamo.Brayan.modules.payments.Payment;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "loans")
@@ -25,6 +29,11 @@ public class Loan {
     @DecimalMin(value = "0.01")
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
+
+    @NotNull
+    @DecimalMin(value = "0.01")
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal totalLoan;
 
     @NotNull
     @DecimalMin(value = "0.0")
@@ -66,4 +75,7 @@ public class Loan {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
+
+    @OneToMany(mappedBy = "loan",fetch = FetchType.LAZY)
+    private Set<Payment> payments=new HashSet<>();
 }

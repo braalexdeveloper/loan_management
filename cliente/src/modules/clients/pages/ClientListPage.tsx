@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { type AppDispatch, type RootState } from "../../../store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { deleteClientThunk, getClientsThunk } from "../store/clientSlice";
 import { Link } from "react-router-dom";
 import { alertConfirm, alertSuccess } from "../../../utils/alertService";
@@ -11,7 +11,8 @@ export default function ClientListPage() {
     const { clients, totalClients, currentPage, totalPages, loading, responseDeleteClient } = useSelector(
         (state: RootState) => state.clients
     );
-    
+    const [searchDni,setSearchDni]=useState("");
+
 
     const deleteClient = async (id: number) => {
 
@@ -29,6 +30,7 @@ export default function ClientListPage() {
 
     }
 
+  
     function itemPage(page: number) {
         
         dispatch(getClientsThunk({page}));
@@ -52,9 +54,19 @@ export default function ClientListPage() {
         dispatch(getClientsThunk({page:currentPage-1}))
     }
 
-    useEffect(() => {
-        dispatch(getClientsThunk({}));
-    }, [dispatch]);
+   useEffect(() => {
+    if (searchDni.trim() === "") {
+            dispatch(getClientsThunk({}));
+            return;
+        }
+    const timer = setTimeout(() => {
+         
+            dispatch(getClientsThunk({ dni: searchDni }));
+        
+    }, 500);
+
+    return () => clearTimeout(timer);
+}, [searchDni, dispatch]);
 
     return (
         <div className="container-fluid">
@@ -102,14 +114,16 @@ export default function ClientListPage() {
                         {/* Search */}
                         <div className="input-group" style={{ maxWidth: "300px" }}>
 
-                            <span className="input-group-text bg-white">
+                            <span className="input-group-text bg-white" >
                                 <i className="bi bi-search"></i>
                             </span>
 
                             <input
                                 type="text"
+                                onChange={(e)=>setSearchDni(e.target.value)}
+                                value={searchDni}
                                 className="form-control"
-                                placeholder="Buscar cliente..."
+                                placeholder="Buscar por DNI"
                             />
 
                         </div>

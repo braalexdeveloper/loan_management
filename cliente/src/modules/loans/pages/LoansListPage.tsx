@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { getLoansThunk } from "../store/LoanSlice";
 import Modal from "../components/Modal";
 import { type LoanI } from "../interfaces/LoanI";
+import LoanDetailModal from "../components/LoanDetailModal";
 
 export default function LoansListPage() {
     const dispatch = useDispatch<AppDispatch>();
@@ -39,7 +40,7 @@ export default function LoansListPage() {
         dispatch(getLoansThunk({ page: currentPage - 1 }))
     }
     //Modal payment
-    const [loanModal, setLoanModal] = useState<LoanI>();
+    const [loanModal, setLoanModal] = useState<LoanI | null>(null);
     const modalPayment = (loan: LoanI) => {
         setLoanModal(loan);
     }
@@ -150,9 +151,7 @@ export default function LoansListPage() {
                                     <th>Cuotas Pagadas</th>
                                     <th>Cuota a Pagar</th>
                                     <th>Total a Pagar</th>
-                                    <th>Saldo</th>
-                                    <th>Fecha de Inicio</th>
-                                    <th>Fecha de Fin</th>
+                                    <th>Saldo</th>                               
                                     <th>Cliente</th>
                                     <th>Status</th>
                                     <th className="text-center">Acciones</th>
@@ -248,13 +247,7 @@ export default function LoansListPage() {
                                                 s/ {loan.remainingBalance}
                                             </td>
 
-                                            <td>
-                                                {formatearFecha(loan.startDate)}
-                                            </td>
-
-                                            <td>
-                                                {formatearFecha(loan.endDate)}
-                                            </td>
+                                           
 
                                             <td>
                                                 {loan.clientName}
@@ -267,12 +260,15 @@ export default function LoansListPage() {
 
                                                 <div className="d-flex justify-content-center gap-2">
 
-                                                    <Link to={"/clients/edit/" + loan.id}
-                                                        className="btn btn-sm btn-outline-warning"
-                                                        title="Detalle de prestamo"
-                                                    >
+                                                   <button
+                                                            className="btn btn-sm btn-outline-warning"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#loanDetailModal"
+                                                            onClick={() => modalPayment(loan)}
+                                                            title="Ver detalle"
+                                                        >
                                                         <i className="bi bi-eye"></i>
-                                                    </Link>
+                                                    </button>
                                                     {loan.status === "CANCELLED" ? "" :
                                                         <button
                                                             className="btn btn-sm btn-outline-success"
@@ -315,8 +311,15 @@ export default function LoansListPage() {
 
 
             </div>
-            <Modal loanModal={loanModal} dispatch={dispatch} getLoansThunk={getLoansThunk} />
+          
+<Modal loanModal={loanModal} dispatch={dispatch} getLoansThunk={getLoansThunk} />
+{
+    loanModal &&(
+<LoanDetailModal loan={loanModal}/>
+    )
+}
 
+                      
             {<div className="row py-4">
                 <nav aria-label="...">
                     <ul className="pagination">

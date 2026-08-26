@@ -3,6 +3,8 @@ package sisPrestamo.Brayan.modules.loans;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,12 +12,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import sisPrestamo.Brayan.Errors.ResourceNotFoundException;
 import sisPrestamo.Brayan.modules.clients.Client;
 import sisPrestamo.Brayan.modules.clients.ClientRepository;
+import sisPrestamo.Brayan.modules.loans.dtos.LoanDetailDto;
 import sisPrestamo.Brayan.modules.loans.dtos.LoanRequest;
 import sisPrestamo.Brayan.modules.loans.dtos.LoanResponse;
+import sisPrestamo.Brayan.modules.payments.dtos.PaymentResponse;
 
 @Service
 public class LoanService {
@@ -26,6 +31,7 @@ public class LoanService {
         this.loanRepository = loanRepository;
         this.clientRepository = clientRepository;
     }
+
 
     public Page<LoanResponse> getLoans(int page, int size, String sortBy, String dni) {
 
@@ -38,6 +44,40 @@ public class LoanService {
         }
 
         return loans.map(this::convertToLoanResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public LoanDetailDto getLoanByID(Long id){
+       Loan loanFound=loanRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Prestamo no encontrado"));
+
+       LoanDetailDto loanDetail=new LoanDetailDto();
+       loanDetail.setId(loanFound.getId());
+        loanDetail.setAmount(loanFound.getAmount());
+        loanDetail.setTotalLoan(loanFound.getTotalLoan());
+        loanDetail.setInterestRate(loanFound.getInterestRate());
+        loanDetail.setInstallments(loanFound.getInstallments());
+        loanDetail.setInstallmentAmount(loanFound.getInstallmentAmount());
+        loanDetail.setRemainingBalance(loanFound.getRemainingBalance());
+        loanDetail.setPaidInstallments(loanFound.getPaidInstallments());
+        loanDetail.setStartDate(loanFound.getStartDate());
+        loanDetail.setEndDate(loanFound.getEndDate());
+        loanDetail.setStatus(loanFound.getStatus());
+        loanDetail.setClientName(loanFound.getClient().getName() + " "+loanFound.getClient().getLastName());
+
+       Set<PaymentResponse> paymentsSet=loanFound.getPayments().stream().map((el)->{
+         PaymentResponse payment=new PaymentResponse();
+         payment.setId(el.getId());
+         payment.setAmount(el.getAmount());
+         payment.setNumberPayment(el.getNumberInstallment());
+         payment.setMethodPayment(el.getMethodPayment());
+         payment.setPaymentDate(el.getPaymentDate());
+         payment.setImagePayment(el.getImagePayment());
+         payment.setIdLoan(el.getLoan().getId());
+         return payment;
+       }).collect(Collectors.toSet());
+
+       loanDetail.setPayments(paymentsSet);
+       return loanDetail;
     }
 
     public LoanResponse createLoan(LoanRequest request) {
@@ -66,6 +106,7 @@ public class LoanService {
         response.setEndDate(loan.getEndDate());
         response.setStatus(loan.getStatus());
         response.setClientName(loan.getClient().getName() + " "+loan.getClient().getLastName());
+        
         return response;
     }
 

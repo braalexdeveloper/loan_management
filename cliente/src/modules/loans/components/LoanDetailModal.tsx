@@ -1,0 +1,365 @@
+import React from "react";
+import "./LoanDetailModal.css";
+import type { LoanI } from "../interfaces/LoanI";
+
+
+
+interface LoanDetailModalProps {
+    loan: LoanI | null;
+}
+
+const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan }) => {
+    if(!loan){
+     return null;
+    }
+    const progress =
+        loan.installments > 0
+            ? (loan.paidInstallments / loan.installments) * 100
+            : 0;
+
+    return (
+        <div
+            className="modal fade"
+            id="loanDetailModal"
+            tabIndex={-1}
+            aria-labelledby="loanDetailModalLabel"
+            aria-hidden="true"
+        >
+            <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                <div className="modal-content loan-detail-modal">
+
+                    {/* HEADER */}
+                    <div className="modal-header">
+                        <div>
+                            <h5
+                                className="modal-title fw-bold"
+                                id="loanDetailModalLabel"
+                            >
+                                Detalle del préstamo
+                            </h5>
+
+                            <small className="text-muted">
+                                Préstamo #{loan.id}
+                            </small>
+                        </div>
+
+                        <button
+                            type="button"
+                            className="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Cerrar"
+                        />
+                    </div>
+
+                    {/* BODY */}
+                    <div className="modal-body p-4">
+
+                        {/* CLIENTE */}
+                        <div className="loan-client-card mb-4">
+
+                            <div>
+                                <span className="text-muted small">
+                                    Cliente
+                                </span>
+
+                                <h5 className="fw-bold mb-0">
+                                    {loan.clientName}
+                                </h5>
+                            </div>
+
+                            <span
+                                className={`badge rounded-pill px-3 py-2 ${
+                                    loan.status === "CANCELLED"
+                                        ? "bg-success"
+                                        : loan.status === "DFS"
+                                            ? "bg-primary"
+                                            : "bg-danger"
+                                }`}
+                            >
+                                {loan.status}
+                            </span>
+
+                        </div>
+
+                        {/* RESUMEN */}
+                        <h6 className="section-title mb-3">
+                            Resumen financiero
+                        </h6>
+
+                        <div className="row g-3 mb-4">
+
+                            <div className="col-md-3">
+                                <div className="loan-stat-card">
+                                    <span className="text-muted small">
+                                        Monto solicitado
+                                    </span>
+
+                                    <h4 className="fw-bold mb-0">
+                                        S/ {loan.amount.toFixed(2)}
+                                    </h4>
+                                </div>
+                            </div>
+
+                            <div className="col-md-3">
+                                <div className="loan-stat-card">
+                                    <span className="text-muted small">
+                                        Total del préstamo
+                                    </span>
+
+                                    <h4 className="fw-bold mb-0">
+                                        S/ {loan.totalLoan.toFixed(2)}
+                                    </h4>
+                                </div>
+                            </div>
+
+                            <div className="col-md-3">
+                                <div className="loan-stat-card">
+                                    <span className="text-muted small">
+                                        Valor de cuota
+                                    </span>
+
+                                    <h4 className="fw-bold mb-0">
+                                        S/ {loan.installmentAmount.toFixed(2)}
+                                    </h4>
+                                </div>
+                            </div>
+
+                            <div className="col-md-3">
+                                <div className="loan-stat-card">
+                                    <span className="text-muted small">
+                                        Saldo pendiente
+                                    </span>
+
+                                    <h4 className="fw-bold text-danger mb-0">
+                                        S/ {loan.remainingBalance.toFixed(2)}
+                                    </h4>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        {/* DATOS DEL PRÉSTAMO */}
+                        <h6 className="section-title mb-3">
+                            Información del préstamo
+                        </h6>
+
+                        <div className="row g-3 mb-4">
+
+                            <div className="col-md-3">
+                                <div className="loan-info-item">
+                                    <span>Tasa de interés</span>
+                                    <strong>
+                                        {loan.interestRate}%
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <div className="col-md-3">
+                                <div className="loan-info-item">
+                                    <span>Número de cuotas</span>
+                                    <strong>
+                                        {loan.installments}
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <div className="col-md-3">
+                                <div className="loan-info-item">
+                                    <span>Fecha de inicio</span>
+                                    <strong>
+                                        {loan.startDate}
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <div className="col-md-3">
+                                <div className="loan-info-item">
+                                    <span>Fecha de finalización</span>
+                                    <strong>
+                                        {loan.endDate}
+                                    </strong>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        {/* PROGRESO */}
+                        <div className="loan-progress-card mb-4">
+
+                            <div className="d-flex justify-content-between align-items-center mb-2">
+
+                                <div>
+                                    <h6 className="fw-bold mb-1">
+                                        Progreso del préstamo
+                                    </h6>
+
+                                    <small className="text-muted">
+                                        {loan.paidInstallments} de{" "}
+                                        {loan.installments} cuotas pagadas
+                                    </small>
+                                </div>
+
+                                <strong>
+                                    {Math.round(progress)}%
+                                </strong>
+
+                            </div>
+
+                            <div
+                                className="progress"
+                                style={{ height: "9px" }}
+                            >
+                                <div
+                                    className="progress-bar bg-success"
+                                    style={{
+                                        width: `${progress}%`,
+                                    }}
+                                />
+                            </div>
+
+                        </div>
+
+                        {/* CRONOGRAMA */}
+                        <div className="mb-3">
+
+                            <h6 className="section-title mb-1">
+                                Cronograma de pagos
+                            </h6>
+
+                            <small className="text-muted">
+                                Detalle de las cuotas del préstamo
+                            </small>
+
+                        </div>
+
+                        <div className="table-responsive loan-schedule-container">
+
+                            <table className="table table-hover align-middle mb-0">
+
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Fecha de pago</th>
+                                        <th>Cuota</th>
+                                        <th>Capital</th>
+                                        <th>Interés</th>
+                                        <th>Saldo</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    {/* Datos visuales temporales */}
+                                    <tr>
+                                        <td>1</td>
+                                        <td>26/08/2026</td>
+
+                                        <td>
+                                            S/{" "}
+                                            {loan.installmentAmount.toFixed(2)}
+                                        </td>
+
+                                        <td>
+                                            S/ {(loan.amount/loan.installments).toFixed(2)}
+                                        </td>
+
+                                        <td>
+                                            S/ {(((loan.amount*loan.interestRate)/100)/loan.installments).toFixed(2)}
+                                        </td>
+
+                                        <td>
+                                            S/ 1,000.00
+                                        </td>
+
+                                        <td>
+                                            <span className="badge bg-success-subtle text-success">
+                                                Pagada
+                                            </span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>2</td>
+                                        <td>26/09/2026</td>
+
+                                        <td>
+                                            S/{" "}
+                                            {loan.installmentAmount.toFixed(2)}
+                                        </td>
+
+                                        <td>
+                                            S/ 450.00
+                                        </td>
+
+                                        <td>
+                                            S/ 50.00
+                                        </td>
+
+                                        <td>
+                                            S/ 500.00
+                                        </td>
+
+                                        <td>
+                                            <span className="badge bg-warning-subtle text-warning">
+                                                Pendiente
+                                            </span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>3</td>
+                                        <td>26/10/2026</td>
+
+                                        <td>
+                                            S/{" "}
+                                            {loan.installmentAmount.toFixed(2)}
+                                        </td>
+
+                                        <td>
+                                            S/ 450.00
+                                        </td>
+
+                                        <td>
+                                            S/ 50.00
+                                        </td>
+
+                                        <td>
+                                            S/ 0.00
+                                        </td>
+
+                                        <td>
+                                            <span className="badge bg-warning-subtle text-warning">
+                                                Pendiente
+                                            </span>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                    {/* FOOTER */}
+                    <div className="modal-footer">
+
+                        <button
+                            type="button"
+                            className="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Cerrar
+                        </button>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default LoanDetailModal;

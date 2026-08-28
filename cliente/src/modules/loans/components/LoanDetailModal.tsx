@@ -5,13 +5,11 @@ import type { LoanI } from "../interfaces/LoanI";
 
 
 interface LoanDetailModalProps {
-    loan: LoanI | null;
+    loan: LoanI;
 }
 
 const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan }) => {
-    if(!loan){
-     return null;
-    }
+    
     const progress =
         loan.installments > 0
             ? (loan.paidInstallments / loan.installments) * 100
@@ -243,21 +241,21 @@ const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan }) => {
                                         <th>Cuota</th>
                                         <th>Capital</th>
                                         <th>Interés</th>
-                                        <th>Saldo</th>
-                                        <th>Estado</th>
+                                        <th>Metodo de Pago</th>
+                                        <th>Comprobante</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
 
-                                    {/* Datos visuales temporales */}
-                                    <tr>
-                                        <td>1</td>
-                                        <td>26/08/2026</td>
+                                    {loan.payments.map((pay:any,index:any)=>(
+<tr key={pay.id}>
+                                        <td>{index+1}</td>
+                                        <td>{pay.paymentDate}</td>
 
                                         <td>
                                             S/{" "}
-                                            {loan.installmentAmount.toFixed(2)}
+                                            {pay.amount.toFixed(2)}
                                         </td>
 
                                         <td>
@@ -269,71 +267,16 @@ const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan }) => {
                                         </td>
 
                                         <td>
-                                            S/ 1,000.00
+                                            {pay.methodPayment}
                                         </td>
 
                                         <td>
-                                            <span className="badge bg-success-subtle text-success">
-                                                Pagada
-                                            </span>
+                                            <img className="img-thumbnail" src={`http://localhost:8080/uploads/payments/${pay.imagePayment}`} width={80} />
                                         </td>
                                     </tr>
+                                    ))}
+                                    
 
-                                    <tr>
-                                        <td>2</td>
-                                        <td>26/09/2026</td>
-
-                                        <td>
-                                            S/{" "}
-                                            {loan.installmentAmount.toFixed(2)}
-                                        </td>
-
-                                        <td>
-                                            S/ 450.00
-                                        </td>
-
-                                        <td>
-                                            S/ 50.00
-                                        </td>
-
-                                        <td>
-                                            S/ 500.00
-                                        </td>
-
-                                        <td>
-                                            <span className="badge bg-warning-subtle text-warning">
-                                                Pendiente
-                                            </span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>3</td>
-                                        <td>26/10/2026</td>
-
-                                        <td>
-                                            S/{" "}
-                                            {loan.installmentAmount.toFixed(2)}
-                                        </td>
-
-                                        <td>
-                                            S/ 450.00
-                                        </td>
-
-                                        <td>
-                                            S/ 50.00
-                                        </td>
-
-                                        <td>
-                                            S/ 0.00
-                                        </td>
-
-                                        <td>
-                                            <span className="badge bg-warning-subtle text-warning">
-                                                Pendiente
-                                            </span>
-                                        </td>
-                                    </tr>
 
                                 </tbody>
 

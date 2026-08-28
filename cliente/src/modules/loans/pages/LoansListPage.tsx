@@ -2,15 +2,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { type AppDispatch, type RootState } from "../../../store";
 import { useEffect, useState } from "react";
-import { getLoansThunk } from "../store/LoanSlice";
+import { getLoanByIdThunk, getLoansThunk } from "../store/LoanSlice";
 import Modal from "../components/Modal";
 import { type LoanI } from "../interfaces/LoanI";
 import LoanDetailModal from "../components/LoanDetailModal";
+import { Modal as BootstrapModal } from "bootstrap";
 
 export default function LoansListPage() {
     const dispatch = useDispatch<AppDispatch>();
 
-    const { loans, loading, currentPage, totalLoans, totalPages } = useSelector((state: RootState) => state.loans);
+    const { loans,loanState, loading, currentPage, totalLoans, totalPages } = useSelector((state: RootState) => state.loans);
 
     const formatearFecha = (fecha: string) => {
         const [anio, mes, dia] = fecha.split("-");
@@ -44,6 +45,11 @@ export default function LoansListPage() {
     const modalPayment = (loan: LoanI) => {
         setLoanModal(loan);
     }
+    //const [loanModalDetail, setLoanModalDetail] = useState<LoanI | null>(null);
+    const modalLoanDetail = (idLoan:number) => {
+        dispatch(getLoanByIdThunk(idLoan))
+        
+    }
 
     //Buscar por prestamos por dni de cliente
     const [dni, setDni] = useState("");
@@ -66,6 +72,52 @@ export default function LoansListPage() {
 
         return () => clearTimeout(timer);
     }, [dni, dispatch]);
+
+    useEffect(() => {
+        if (!loanState) return;
+
+        const element = document.getElementById("loanDetailModal");
+
+        if (!element) return;
+
+        const modal = BootstrapModal.getOrCreateInstance(element);
+
+        modal.show();
+
+       /*const handleClose = () => {
+        setLoanModalDetail(null);
+    };
+
+    element.addEventListener("hidden.bs.modal", handleClose);
+
+    return () => {
+        element.removeEventListener("hidden.bs.modal", handleClose);
+    };
+*/
+    }, [loanState]);
+
+    useEffect(() => {
+    if (!loanModal) return;
+
+    const element = document.getElementById("paymentModal");
+
+    if (!element) return;
+
+    const modal = BootstrapModal.getOrCreateInstance(element);
+
+    modal.show();
+
+    const handleClose = () => {
+        setLoanModal(null);
+    };
+
+    element.addEventListener("hidden.bs.modal", handleClose);
+
+    return () => {
+        element.removeEventListener("hidden.bs.modal", handleClose);
+    };
+
+}, [loanModal]);
 
     return (
         <div className="container-fluid">
@@ -151,7 +203,7 @@ export default function LoansListPage() {
                                     <th>Cuotas Pagadas</th>
                                     <th>Cuota a Pagar</th>
                                     <th>Total a Pagar</th>
-                                    <th>Saldo</th>                               
+                                    <th>Saldo</th>
                                     <th>Cliente</th>
                                     <th>Status</th>
                                     <th className="text-center">Acciones</th>
@@ -247,7 +299,7 @@ export default function LoansListPage() {
                                                 s/ {loan.remainingBalance}
                                             </td>
 
-                                           
+
 
                                             <td>
                                                 {loan.clientName}
@@ -260,20 +312,18 @@ export default function LoansListPage() {
 
                                                 <div className="d-flex justify-content-center gap-2">
 
-                                                   <button
-                                                            className="btn btn-sm btn-outline-warning"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#loanDetailModal"
-                                                            onClick={() => modalPayment(loan)}
-                                                            title="Ver detalle"
-                                                        >
+                                                    <button
+                                                        className="btn btn-sm btn-outline-warning"
+
+                                                        onClick={() => modalLoanDetail(Number(loan.id))}
+                                                        title="Ver detalle"
+                                                    >
                                                         <i className="bi bi-eye"></i>
                                                     </button>
                                                     {loan.status === "CANCELLED" ? "" :
                                                         <button
                                                             className="btn btn-sm btn-outline-success"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#paymentModal"
+                                                            
                                                             onClick={() => modalPayment(loan)}
                                                             title="Pagar Cuota"
                                                         >
@@ -311,15 +361,17 @@ export default function LoansListPage() {
 
 
             </div>
-          
+{loanModal && (
 <Modal loanModal={loanModal} dispatch={dispatch} getLoansThunk={getLoansThunk} />
-{
-    loanModal &&(
-<LoanDetailModal loan={loanModal}/>
-    )
-}
+)}
+            
+            {
+                loanState && (
+                    <LoanDetailModal loan={loanState} />
+                )
+            }
 
-                      
+
             {<div className="row py-4">
                 <nav aria-label="...">
                     <ul className="pagination">

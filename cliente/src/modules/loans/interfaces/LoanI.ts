@@ -11,4 +11,5 @@ export interface LoanI{
     endDate:string;
     status:string;
     clientName:string;
+    payments?:any
 }

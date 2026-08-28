@@ -5,14 +5,12 @@ import { alertError, alertSuccess } from "../../../utils/alertService";
 
 
 interface ModalI {
-    loanModal: LoanI | null;
+    loanModal: LoanI;
     dispatch:any;
     getLoansThunk:any
 }
 export default function Modal({ loanModal,dispatch,getLoansThunk }: ModalI) {
-    if(!loanModal){
-return null;
-    }
+   
 
     const [payment, setPayment] = useState({
         idLoan: 0,
@@ -92,6 +90,7 @@ try {
         console.log(payment)
     }, [payment])
 
+   
     return (
 
         <>

@@ -11,7 +11,7 @@ import { Modal as BootstrapModal } from "bootstrap";
 export default function LoansListPage() {
     const dispatch = useDispatch<AppDispatch>();
 
-    const { loans,loanState, loading, currentPage, totalLoans, totalPages } = useSelector((state: RootState) => state.loans);
+    const { loans, loanState, loading, currentPage, totalLoans, totalPages } = useSelector((state: RootState) => state.loans);
 
     const formatearFecha = (fecha: string) => {
         const [anio, mes, dia] = fecha.split("-");
@@ -45,10 +45,11 @@ export default function LoansListPage() {
     const modalPayment = (loan: LoanI) => {
         setLoanModal(loan);
     }
-    //const [loanModalDetail, setLoanModalDetail] = useState<LoanI | null>(null);
-    const modalLoanDetail = (idLoan:number) => {
+    const [loanModalDetail, setLoanModalDetail] = useState<boolean>(false);
+    const modalLoanDetail = (idLoan: number) => {
         dispatch(getLoanByIdThunk(idLoan))
-        
+        setLoanModalDetail(true);
+
     }
 
     //Buscar por prestamos por dni de cliente
@@ -84,40 +85,40 @@ export default function LoansListPage() {
 
         modal.show();
 
-       /*const handleClose = () => {
-        setLoanModalDetail(null);
-    };
-
-    element.addEventListener("hidden.bs.modal", handleClose);
-
-    return () => {
-        element.removeEventListener("hidden.bs.modal", handleClose);
-    };
-*/
+        const handleClose = () => {
+         setLoanModalDetail(false);
+     };
+ 
+     element.addEventListener("hidden.bs.modal", handleClose);
+ 
+     return () => {
+         element.removeEventListener("hidden.bs.modal", handleClose);
+     };
+ 
     }, [loanState]);
 
     useEffect(() => {
-    if (!loanModal) return;
+        if (!loanModal) return;
 
-    const element = document.getElementById("paymentModal");
+        const element = document.getElementById("paymentModal");
 
-    if (!element) return;
+        if (!element) return;
 
-    const modal = BootstrapModal.getOrCreateInstance(element);
+        const modal = BootstrapModal.getOrCreateInstance(element);
 
-    modal.show();
+        modal.show();
 
-    const handleClose = () => {
-        setLoanModal(null);
-    };
+        const handleClose = () => {
+            setLoanModal(null);
+        };
 
-    element.addEventListener("hidden.bs.modal", handleClose);
+        element.addEventListener("hidden.bs.modal", handleClose);
 
-    return () => {
-        element.removeEventListener("hidden.bs.modal", handleClose);
-    };
+        return () => {
+            element.removeEventListener("hidden.bs.modal", handleClose);
+        };
 
-}, [loanModal]);
+    }, [loanModal]);
 
     return (
         <div className="container-fluid">
@@ -323,7 +324,7 @@ export default function LoansListPage() {
                                                     {loan.status === "CANCELLED" ? "" :
                                                         <button
                                                             className="btn btn-sm btn-outline-success"
-                                                            
+
                                                             onClick={() => modalPayment(loan)}
                                                             title="Pagar Cuota"
                                                         >
@@ -361,12 +362,12 @@ export default function LoansListPage() {
 
 
             </div>
-{loanModal && (
-<Modal loanModal={loanModal} dispatch={dispatch} getLoansThunk={getLoansThunk} />
-)}
-            
+            {loanModal && (
+                <Modal loanModal={loanModal} dispatch={dispatch} getLoansThunk={getLoansThunk} />
+            )}
+
             {
-                loanState && (
+                (loanModalDetail && loanState) && (
                     <LoanDetailModal loan={loanState} />
                 )
             }

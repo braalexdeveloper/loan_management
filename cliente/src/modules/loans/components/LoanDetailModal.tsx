@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./LoanDetailModal.css";
 import type { LoanI } from "../interfaces/LoanI";
 
@@ -9,7 +9,9 @@ interface LoanDetailModalProps {
 }
 
 const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan }) => {
-    
+
+    const [selectedImage, setSelectedImage] = useState<string|null>(null);
+
     const progress =
         loan.installments > 0
             ? (loan.paidInstallments / loan.installments) * 100
@@ -66,13 +68,12 @@ const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan }) => {
                             </div>
 
                             <span
-                                className={`badge rounded-pill px-3 py-2 ${
-                                    loan.status === "CANCELLED"
-                                        ? "bg-success"
-                                        : loan.status === "DFS"
-                                            ? "bg-primary"
-                                            : "bg-danger"
-                                }`}
+                                className={`badge rounded-pill px-3 py-2 ${loan.status === "CANCELLED"
+                                    ? "bg-success"
+                                    : loan.status === "DFS"
+                                        ? "bg-primary"
+                                        : "bg-danger"
+                                    }`}
                             >
                                 {loan.status}
                             </span>
@@ -248,39 +249,81 @@ const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan }) => {
 
                                 <tbody>
 
-                                    {loan.payments.map((pay:any,index:any)=>(
-<tr key={pay.id}>
-                                        <td>{index+1}</td>
-                                        <td>{pay.paymentDate}</td>
+                                    {loan.payments.map((pay: any, index: any) => (
+                                        <tr key={pay.id}>
+                                            <td>{index + 1}</td>
+                                            <td>{pay.paymentDate}</td>
 
-                                        <td>
-                                            S/{" "}
-                                            {pay.amount.toFixed(2)}
-                                        </td>
+                                            <td>
+                                                S/{" "}
+                                                {pay.amount.toFixed(2)}
+                                            </td>
 
-                                        <td>
-                                            S/ {(loan.amount/loan.installments).toFixed(2)}
-                                        </td>
+                                            <td>
+                                                S/ {(loan.amount / loan.installments).toFixed(2)}
+                                            </td>
 
-                                        <td>
-                                            S/ {(((loan.amount*loan.interestRate)/100)/loan.installments).toFixed(2)}
-                                        </td>
+                                            <td>
+                                                S/ {(((loan.amount * loan.interestRate) / 100) / loan.installments).toFixed(2)}
+                                            </td>
 
-                                        <td>
-                                            {pay.methodPayment}
-                                        </td>
+                                            <td>
+                                                {pay.methodPayment}
+                                            </td>
 
-                                        <td>
-                                            <img className="img-thumbnail" src={`http://localhost:8080/uploads/payments/${pay.imagePayment}`} width={80} />
-                                        </td>
-                                    </tr>
+                                            <td>
+                                                {pay.imagePayment ? (
+                                                    <img
+                                                    className="img-thumbnail"
+                                                    src={`http://localhost:8080/uploads/payments/${pay.imagePayment}`}
+                                                    width={80}
+                                                    style={{ cursor: 'pointer' }}
+                                                    onClick={() =>
+                                                        setSelectedImage(`http://localhost:8080/uploads/payments/${pay.imagePayment}`)}
+                                                />
+                                                ) : "No hay imagen"}
+                                            </td>
+                                        </tr>
                                     ))}
-                                    
+
 
 
                                 </tbody>
 
                             </table>
+                            {selectedImage && (
+    <div
+        className="modal fade show d-block"
+        tabIndex={-1}
+        style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
+        onClick={() => setSelectedImage(null)}
+    >
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+            <div className="modal-content bg-transparent border-0">
+
+                <div className="modal-body text-center position-relative">
+
+                    <button
+                        type="button"
+                        className="btn-close btn-close-white position-absolute top-0 end-0"
+                        onClick={() => setSelectedImage(null)}
+                    />
+
+                    <img src={selectedImage}
+                        className="img-fluid rounded"
+                        style={{
+                            maxHeight: '90vh',
+                            objectFit: 'contain'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    />
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+)}
 
                         </div>
 
@@ -288,7 +331,13 @@ const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan }) => {
 
                     {/* FOOTER */}
                     <div className="modal-footer">
-
+                         <a
+                            href={`http://localhost:8080/api/loans/${loan.id}/pdf`}
+                            className="btn btn-warning"
+                            
+                        >
+                            Descargar Cronograma en PDF
+                        </a>
                         <button
                             type="button"
                             className="btn btn-secondary"

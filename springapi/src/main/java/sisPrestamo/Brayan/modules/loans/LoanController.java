@@ -3,7 +3,9 @@ package sisPrestamo.Brayan.modules.loans;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,6 +47,23 @@ public class LoanController {
     public ResponseEntity<LoanDetailDto> getLoan(@PathVariable Long id){
        LoanDetailDto loan=loanService.getLoanByID(id);
        return ResponseEntity.ok(loan);
+    }
+
+    // Generar cronograma PDF
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> generatePdfCronograma(
+            @PathVariable Long id
+    ) {
+
+        byte[] pdf = loanService.generatePdfCronograma(id);
+
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=cronograma-" + id + ".pdf"
+                )
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
     }
 
     @PostMapping

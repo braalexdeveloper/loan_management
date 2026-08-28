@@ -43,10 +43,12 @@ const loanSlice = createSlice({
     builder
       .addCase(getLoansThunk.pending, (state) => {
         state.loading = true;
+        
       })
       .addCase(getLoansThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.loans = action.payload.data;
+        
         state.currentPage = action.payload.currentPage;
         state.totalLoans = action.payload.totalElements;
         state.totalPages = action.payload.totalPages;

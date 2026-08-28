@@ -251,22 +251,7 @@ try {
                                     />
                                 </div>
 
-                                {/* Observación */}
-                                <div className="mb-3">
-                                    <label
-                                        htmlFor="paymentDescription"
-                                        className="form-label"
-                                    >
-                                        Observación
-                                    </label>
-
-                                    <textarea
-                                        className="form-control"
-                                        id="paymentDescription"
-                                        rows={3}
-                                        placeholder="Ingrese una observación..."
-                                    ></textarea>
-                                </div>
+                                
 
                             </div>
 

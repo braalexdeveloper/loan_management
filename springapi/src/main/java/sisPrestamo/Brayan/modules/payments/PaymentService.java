@@ -51,7 +51,7 @@ public class PaymentService {
         loanFound.setRemainingBalance(newRemainingBalance);
         loanFound.setPaidInstallments(loanFound.getPaidInstallments() + 1);
         if (loanFound.getRemainingBalance().compareTo(BigDecimal.ZERO) == 0) {
-            loanFound.setStatus(LoanStatus.CANCELLED);
+            loanFound.setStatus(LoanStatus.PAGADO);
         }
 
         loanRepository.save(loanFound);

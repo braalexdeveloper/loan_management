@@ -429,7 +429,7 @@ public byte[] generatePdfCronograma(Long id) {
         loan.setStartDate(request.getStartDate());
         loan.setEndDate(
                 LocalDate.now().plusMonths(request.getInstallments()));
-        loan.setStatus(LoanStatus.PENDING);
+        loan.setStatus(LoanStatus.ACTIVO);
         loan.setClient(client);
         return loan;
     }

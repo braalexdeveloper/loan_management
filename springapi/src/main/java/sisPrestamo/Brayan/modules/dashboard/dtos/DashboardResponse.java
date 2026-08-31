@@ -15,4 +15,6 @@ public class DashboardResponse {
     private Long cantLoansPayment;
     private Long cantLoansActive;
     private BigDecimal totalLoansAmount;
+    private BigDecimal totalLoansRemainingBalance;
+    private BigDecimal totalPagadoGeneral;
 }

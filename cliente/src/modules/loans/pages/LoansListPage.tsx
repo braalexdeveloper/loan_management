@@ -7,6 +7,7 @@ import Modal from "../components/Modal";
 import { type LoanI } from "../interfaces/LoanI";
 import LoanDetailModal from "../components/LoanDetailModal";
 import { Modal as BootstrapModal } from "bootstrap";
+import { FaMoneyBillWave } from "react-icons/fa";
 
 export default function LoansListPage() {
     const dispatch = useDispatch<AppDispatch>();
@@ -137,7 +138,7 @@ export default function LoansListPage() {
                 </div>
 
                 <Link to={"/loans/create"} className="btn btn-primary mt-3 mt-md-0">
-                    <i className="bi bi-person-plus me-2"></i>
+                    <FaMoneyBillWave className="me-2" />
                     Nuevo Prestamo
                 </Link>
 
@@ -306,7 +307,7 @@ export default function LoansListPage() {
                                                 {loan.clientName}
                                             </td>
                                             <td>
-                                                <span className={"badge " + (loan.status === "PENDING" ? "text-bg-danger" : "text-bg-success")}>{loan.status}</span>
+                                                <span className={"badge " + (loan.status === "ACTIVO" ? "text-bg-primary" : "text-bg-success")}>{loan.status}</span>
                                             </td>
 
                                             <td>
@@ -321,7 +322,7 @@ export default function LoansListPage() {
                                                     >
                                                         <i className="bi bi-eye"></i>
                                                     </button>
-                                                    {loan.status === "CANCELLED" ? "" :
+                                                    {loan.status === "PAGADO" ? "" :
                                                         <button
                                                             className="btn btn-sm btn-outline-success"
 

@@ -16,7 +16,9 @@ export default function DashboardPage() {
         cantLoans:0,
         cantLoansPayment:0,
         cantLoansActive:0,
-        totalLoansAmount:0
+        totalLoansAmount:0,
+        totalLoansRemainingBalance:0,
+        totalPagadoGeneral:0
     });
 
     
@@ -257,7 +259,7 @@ export default function DashboardPage() {
                                     </p>
 
                                     <h4 className="fw-bold text-success">
-                                        S/ 18,750.00
+                                        S/ {itemDashboard.totalPagadoGeneral}
                                     </h4>
                                 </div>
 
@@ -267,7 +269,7 @@ export default function DashboardPage() {
                                     </p>
 
                                     <h4 className="fw-bold text-danger">
-                                        S/ 6,650.00
+                                        S/{itemDashboard.totalLoansRemainingBalance}
                                     </h4>
                                 </div>
 

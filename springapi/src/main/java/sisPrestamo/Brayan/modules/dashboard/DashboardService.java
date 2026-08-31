@@ -30,6 +30,8 @@ public class DashboardService {
         Long cantLoansActive=loanRepository.countByStatus(LoanStatus.ACTIVO);
 
         BigDecimal totalAmountLoans=loanRepository.sumTotalAmount();
+        BigDecimal totalSaldoGeneral=loanRepository.sumTotalRemainingBalance();
+        BigDecimal totalAmountPayments=paymentRepository.sumTotalAmountPayments();
 
         DashboardResponse response=new DashboardResponse();
         response.setCantClients(cantClients);
@@ -37,6 +39,8 @@ public class DashboardService {
         response.setCantLoansActive(cantLoansActive);
         response.setCantLoansPayment(cantLoansPayment);
         response.setTotalLoansAmount(totalAmountLoans);
+        response.setTotalLoansRemainingBalance(totalSaldoGeneral);
+        response.setTotalPagadoGeneral(totalAmountPayments);
         return response;
 
     }

@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa";
 import { getDashboard } from "../service/DashboardService";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function DashboardPage() {
 
@@ -48,10 +49,10 @@ export default function DashboardPage() {
                     </p>
                 </div>
 
-                <button className="btn btn-primary">
+                <Link to={"/loans/create"} className="btn btn-primary">
                     <FaMoneyBillWave className="me-2" />
                     Nuevo préstamo
-                </button>
+                </Link>
             </div>
 
 
